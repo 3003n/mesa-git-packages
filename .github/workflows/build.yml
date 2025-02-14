@@ -39,6 +39,7 @@ jobs:
         run: |
           pacman -S --noconfirm cmake meson python python-mako ninja llvm clang lld
           pacman -S --noconfirm lib32-gcc-libs gcc-multilib
+          pacman -S --noconfirm lib32-libxml2 lib32-libvdpau lib32-libglvnd lib32-libva lib32-libxrandr lib32-llvm lib32-spirv-llvm-translator lib32-spirv-tools
 
       - name: Prepare build directory
         run: |
