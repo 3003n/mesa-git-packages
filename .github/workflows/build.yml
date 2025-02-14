@@ -51,7 +51,7 @@ jobs:
           sudo -u builder bash -c '
             git clone https://aur.archlinux.org/mesa-git.git
             cd mesa-git
-            makepkg -s --noconfirm
+            makepkg -fcCs --noconfirm
           '
           pacman -Rnsdd mesa --noconfirm
           pacman -U --noconfirm $GITHUB_WORKSPACE/pkgbuild/mesa-git/mesa-git-*.pkg.tar.zst
@@ -62,7 +62,7 @@ jobs:
           sudo -u builder bash -c '
             git clone https://aur.archlinux.org/lib32-mesa-git.git
             cd lib32-mesa-git
-            makepkg -s --noconfirm
+            makepkg -fcCs --noconfirm
           '
 
       - name: Create release
