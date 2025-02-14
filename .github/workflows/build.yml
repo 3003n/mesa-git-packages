@@ -18,6 +18,11 @@ jobs:
 
       - name: Setup system
         run: |
+          # add multilib
+          echo "[multilib]" >> /etc/pacman.conf
+          echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+          cat /etc/pacman.conf
+          echo ""
           pacman -Syu --noconfirm
           pacman -S --noconfirm git base-devel sudo
 
@@ -37,6 +42,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pacman -Sy --noconfirm
           pacman -S --noconfirm cmake meson python python-mako ninja llvm clang lld
           pacman -S --noconfirm lib32-gcc-libs gcc-multilib
           pacman -S --noconfirm lib32-libxml2 lib32-libvdpau lib32-libglvnd lib32-libva lib32-libxrandr lib32-llvm lib32-spirv-llvm-translator lib32-spirv-tools
