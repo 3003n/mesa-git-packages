@@ -1,6 +1,10 @@
 name: Build mesa-git packages
 
 on:
+  push:
+    branches:
+      - main
+      - master
   schedule:
     - cron: "0 0 * * *" # 每天运行
   workflow_dispatch: # 允许手动触发
@@ -109,5 +113,6 @@ jobs:
           name: Mesa Git Build ${{ needs.build.outputs.mesa_date }}-${{ needs.build.outputs.mesa_hash }}
           draft: false
           prerelease: false
+          make_latest: true
           files: |
             /tmp/artifacts/*.pkg.tar.zst
