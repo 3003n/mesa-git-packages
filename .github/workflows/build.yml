@@ -53,6 +53,7 @@ jobs:
             cd mesa-git
             makepkg -s --noconfirm
           '
+          pacman -U --noconfirm $GITHUB_WORKSPACE/pkgbuild/mesa-git/mesa-git-*.pkg.tar.zst
 
       - name: Build lib32-mesa-git
         run: |
