@@ -53,6 +53,8 @@ jobs:
       - name: Install dependencies
         run: |
           pacman -Sy --noconfirm
+          sed -i '/BUILDENV/s/ check/ !check/g' /etc/makepkg.conf
+          sed -i '/OPTIONS/s/ debug/ !debug/g' /etc/makepkg.conf
           pacman -S --noconfirm cmake meson python python-mako ninja llvm clang lld
           pacman -S --noconfirm lib32-gcc-libs gcc-multilib
 
