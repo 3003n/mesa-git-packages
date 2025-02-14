@@ -1,5 +1,8 @@
 name: Build mesa-git packages
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -115,4 +118,4 @@ jobs:
           prerelease: false
           make_latest: true
           files: |
-            /tmp/artifacts/*.pkg.tar.zst
+            /tmp/artifacts/**/*.pkg.tar.zst
