@@ -40,18 +40,28 @@ jobs:
           pacman -S --noconfirm cmake meson python python-mako ninja llvm clang lld
           pacman -S --noconfirm lib32-gcc-libs gcc-multilib
 
+      - name: Prepare build directory
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/pkgbuild
+          chown -R builder:builder $GITHUB_WORKSPACE/pkgbuild
+
       - name: Build mesa-git
         run: |
-          cd $GITHUB_WORKSPACE
-          mkdir -p pkgbuild
-          cd pkgbuild
-          sudo -u builder git clone https://aur.archlinux.org/mesa-git.git
-          cd mesa-git
-          sudo -u builder makepkg -s --noconfirm
-          cd ..
-          sudo -u builder git clone https://aur.archlinux.org/lib32-mesa-git.git
-          cd lib32-mesa-git
-          sudo -u builder makepkg -s --noconfirm
+          cd $GITHUB_WORKSPACE/pkgbuild
+          sudo -u builder bash -c '
+            git clone https://aur.archlinux.org/mesa-git.git
+            cd mesa-git
+            makepkg -s --noconfirm
+          '
+
+      - name: Build lib32-mesa-git
+        run: |
+          cd $GITHUB_WORKSPACE/pkgbuild
+          sudo -u builder bash -c '
+            git clone https://aur.archlinux.org/lib32-mesa-git.git
+            cd lib32-mesa-git
+            makepkg -s --noconfirm
+          '
 
       - name: Create release
         id: create_release
