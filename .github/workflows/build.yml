@@ -73,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mesa-git
-          path: $GITHUB_WORKSPACE/pkgbuild/mesa-git/*.pkg.tar.zst
+          path: ${{ github.workspace }}/pkgbuild/mesa-git/*.pkg.tar.zst
 
       - name: Build lib32-mesa-git
         run: |
@@ -88,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lib32-mesa-git
-          path: $GITHUB_WORKSPACE/pkgbuild/lib32-mesa-git/*.pkg.tar.zst
+          path: ${{ github.workspace }}/pkgbuild/lib32-mesa-git/*.pkg.tar.zst
 
   release:
     needs: build
