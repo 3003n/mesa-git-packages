@@ -1,0 +1,68 @@
+name: Build mesa-git packages
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天运行
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup system
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm git base-devel sudo
+
+      - name: Create build user
+        run: |
+          useradd -m builder
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chown -R builder:builder $GITHUB_WORKSPACE
+
+      - name: Get mesa commit hash
+        id: mesa_hash
+        run: |
+          git clone --depth 1 https://gitlab.freedesktop.org/mesa/mesa.git /tmp/mesa
+          cd /tmp/mesa
+          echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: |
+          pacman -S --noconfirm cmake meson python python-mako ninja llvm clang lld
+          pacman -S --noconfirm lib32-gcc-libs gcc-multilib
+
+      - name: Build mesa-git
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir -p pkgbuild
+          cd pkgbuild
+          sudo -u builder git clone https://aur.archlinux.org/mesa-git.git
+          cd mesa-git
+          sudo -u builder makepkg -s --noconfirm
+          cd ..
+          sudo -u builder git clone https://aur.archlinux.org/lib32-mesa-git.git
+          cd lib32-mesa-git
+          sudo -u builder makepkg -s --noconfirm
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.mesa_hash.outputs.hash }}
+          name: Mesa Git Build ${{ steps.mesa_hash.outputs.date }}-${{ steps.mesa_hash.outputs.hash }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ github.workspace }}/pkgbuild/mesa-git/mesa-git-*.pkg.tar.zst
+            ${{ github.workspace }}/pkgbuild/lib32-mesa-git/lib32-mesa-git-*.pkg.tar.zst
