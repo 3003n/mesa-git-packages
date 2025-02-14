@@ -2,12 +2,15 @@ name: Build mesa-git packages
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天运行
-  workflow_dispatch:  # 允许手动触发
+    - cron: "0 0 * * *" # 每天运行
+  workflow_dispatch: # 允许手动触发
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      mesa_hash: ${{ steps.mesa_hash.outputs.hash }}
+      mesa_date: ${{ steps.mesa_hash.outputs.date }}
     container:
       image: archlinux:base-devel
       options: --privileged
@@ -45,7 +48,6 @@ jobs:
           pacman -Sy --noconfirm
           pacman -S --noconfirm cmake meson python python-mako ninja llvm clang lld
           pacman -S --noconfirm lib32-gcc-libs gcc-multilib
-          pacman -S --noconfirm lib32-libxml2 lib32-libvdpau lib32-libglvnd lib32-libva lib32-libxrandr lib32-llvm lib32-spirv-llvm-translator lib32-spirv-tools
 
       - name: Prepare build directory
         run: |
@@ -63,6 +65,12 @@ jobs:
           pacman -Rnsdd mesa --noconfirm
           pacman -U --noconfirm $GITHUB_WORKSPACE/pkgbuild/mesa-git/mesa-git-*.pkg.tar.zst
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mesa-git
+          path: $GITHUB_WORKSPACE/pkgbuild/mesa-git/*.pkg.tar.zst
+
       - name: Build lib32-mesa-git
         run: |
           cd $GITHUB_WORKSPACE/pkgbuild
@@ -72,16 +80,34 @@ jobs:
             makepkg -fcCs --noconfirm
           '
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lib32-mesa-git
+          path: $GITHUB_WORKSPACE/pkgbuild/lib32-mesa-git/*.pkg.tar.zst
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: mkdir /tmp/artifacts
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/artifacts
+
+      - run: ls -R /tmp/artifacts
+
       - name: Create release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.mesa_hash.outputs.hash }}
-          name: Mesa Git Build ${{ steps.mesa_hash.outputs.date }}-${{ steps.mesa_hash.outputs.hash }}
+          tag_name: ${{ needs.build.outputs.mesa_hash }}
+          name: Mesa Git Build ${{ needs.build.outputs.mesa_date }}-${{ needs.build.outputs.mesa_hash }}
           draft: false
           prerelease: false
           files: |
-            ${{ github.workspace }}/pkgbuild/mesa-git/mesa-git-*.pkg.tar.zst
-            ${{ github.workspace }}/pkgbuild/lib32-mesa-git/lib32-mesa-git-*.pkg.tar.zst
+            /tmp/artifacts/*.pkg.tar.zst
