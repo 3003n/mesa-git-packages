@@ -69,6 +69,8 @@ jobs:
           sudo -u builder bash -c '
             git clone https://aur.archlinux.org/mesa-git.git
             cd mesa-git
+            # Add patch application to prepare()
+            sed -i "/prepare() {/a \    # Apply patches\n    for patch in \$GITHUB_WORKSPACE/patch/*.patch; do\n        msg2 \"Applying patch: \${patch}\"\n        cd mesa\n        git apply \"\${patch}\"\n        cd ..\n    done" PKGBUILD
             makepkg -fcCs --noconfirm
           '
           pacman -Rnsdd mesa --noconfirm
@@ -86,6 +88,8 @@ jobs:
           sudo -u builder bash -c '
             git clone https://aur.archlinux.org/lib32-mesa-git.git
             cd lib32-mesa-git
+            # Add patch application to prepare()
+            sed -i "/prepare() {/a \    # Apply patches\n    for patch in \$GITHUB_WORKSPACE/patch/*.patch; do\n        msg2 \"Applying patch: \${patch}\"\n        cd mesa\n        git apply \"\${patch}\"\n        cd ..\n    done" PKGBUILD
             makepkg -fcCs --noconfirm
           '
 
