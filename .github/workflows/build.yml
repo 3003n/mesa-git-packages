@@ -66,13 +66,13 @@ jobs:
       - name: Build mesa-git
         run: |
           cd $GITHUB_WORKSPACE/pkgbuild
-          sudo -u builder bash -c '
+          sudo -u builder bash -c "
             git clone https://aur.archlinux.org/mesa-git.git
             cd mesa-git
             # Add patch application to prepare()
-            sed -i "/prepare() {/a \    # Apply patches\n    for patch in \$GITHUB_WORKSPACE/patch/*.patch; do\n        msg2 \"Applying patch: \${patch}\"\n        cd mesa\n        git apply \"\${patch}\"\n        cd ..\n    done" PKGBUILD
+            sed -i '/prepare() {/a \    # Apply patches\n    for patch in \"$GITHUB_WORKSPACE/patch\"/*.patch; do\n        msg2 \"Applying patch: \${patch}\"\n        cd mesa\n        git apply \"\${patch}\"\n        cd ..\n    done' PKGBUILD
             makepkg -fcCs --noconfirm
-          '
+          "
           pacman -Rnsdd mesa --noconfirm
           pacman -U --noconfirm $GITHUB_WORKSPACE/pkgbuild/mesa-git/mesa-git-*.pkg.tar.zst
 
@@ -85,13 +85,13 @@ jobs:
       - name: Build lib32-mesa-git
         run: |
           cd $GITHUB_WORKSPACE/pkgbuild
-          sudo -u builder bash -c '
+          sudo -u builder bash -c "
             git clone https://aur.archlinux.org/lib32-mesa-git.git
             cd lib32-mesa-git
             # Add patch application to prepare()
-            sed -i "/prepare() {/a \    # Apply patches\n    for patch in \$GITHUB_WORKSPACE/patch/*.patch; do\n        msg2 \"Applying patch: \${patch}\"\n        cd mesa\n        git apply \"\${patch}\"\n        cd ..\n    done" PKGBUILD
+            sed -i '/prepare() {/a \    # Apply patches\n    for patch in \"$GITHUB_WORKSPACE/patch\"/*.patch; do\n        msg2 \"Applying patch: \${patch}\"\n        cd mesa\n        git apply \"\${patch}\"\n        cd ..\n    done' PKGBUILD
             makepkg -fcCs --noconfirm
-          '
+          "
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
