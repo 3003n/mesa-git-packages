@@ -1,16 +1,57 @@
-Author: Maarten Lankhorst <maarten.lankhorst@intel.com>
-Date:   Mon Feb 17 14:55:29 2025 -0800
+From 4fdbc6d4d9906acad52780de7e679b3fd6b6f0c9 Mon Sep 17 00:00:00 2001
+From: Matthew Schwartz <matthew.schwartz@linux.dev>
+Date: Tue, 18 Feb 2025 14:44:49 -0800
+Subject: [PATCH 1/2] iris: Mark images with format modifiers set as scanout
 
-    HACK: drm/xe gamescope fix
-    
-    Workaround gamescope DRM issues on Xe by allocating ANV_BO_ALLOC_SCANOUT
-    when using VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT
-    
-    Link: https://gitlab.freedesktop.org/drm/xe/kernel/-/issues/4292#note_2784316
-    Signed-off-by: Matthew Schwartz <matthew.schwartz@linux.dev>
+Images with modifiers can be shared between GL and Vulkan drivers,
+so we should handle setting buffers with DRM modifiers as scanout
+to align with ANV.
+
+Suggested-by: Jianxun Zhang <jianxun.zhang@intel.com>
+Signed-off-by: Matthew Schwartz <matthew.schwartz@linux.dev>
+---
+ src/gallium/drivers/iris/iris_resource.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/gallium/drivers/iris/iris_resource.c b/src/gallium/drivers/iris/iris_resource.c
+index 302afa9ae84..eb5c62a7c30 100644
+--- a/src/gallium/drivers/iris/iris_resource.c
++++ b/src/gallium/drivers/iris/iris_resource.c
+@@ -1130,6 +1130,10 @@ iris_resource_create_for_image(struct pipe_screen *pscreen,
+    if (iris_resource_image_is_pat_compressible(screen, templ, res, flags))
+       flags |= BO_ALLOC_COMPRESSED;
+ 
++   /* If a DRM format modifier is in use, mark the buffer as scanout.*/
++   if (modifier != DRM_FORMAT_MOD_INVALID)
++      flags |= BO_ALLOC_SCANOUT;
++
+    /* These are for u_upload_mgr buffers only */
+    assert(!(templ->flags & (IRIS_RESOURCE_FLAG_SHADER_MEMZONE |
+                             IRIS_RESOURCE_FLAG_SURFACE_MEMZONE |
+-- 
+2.48.1
+
+
+From 97d3b80b186157f644728b7b8f1addc425d7bc4c Mon Sep 17 00:00:00 2001
+From: Maarten Lankhorst <dev@lankhorst.se>
+Date: Tue, 18 Feb 2025 14:46:50 -0800
+Subject: [PATCH 2/2] anv: Mark images with format modifiers set as scanout
+
+We currently use the presence of struct WSI_IMAGE_CREATE_INFO_MESA.scanout to mark the BO as scanout,
+but this only handles the linear case, and fails when drm format modifiers are used.
+
+Also handle the case of exportable BO with tiling set to VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT.
+This fixes the gamescope handling of using vulkan allocated images for scanout.
+
+Link: https://gitlab.freedesktop.org/drm/xe/kernel/-/issues/4292#note_2784316
+Signed-off-by: Maarten Lankhorst <dev@lankhorst.se>
+Signed-off-by: Matthew Schwartz <matthew.schwartz@linux.dev>
+---
+ src/intel/vulkan/anv_device.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/src/intel/vulkan/anv_device.c b/src/intel/vulkan/anv_device.c
-index 1884932bbc7..cbc1b4aad87 100644
+index 92eeb5b8c54..013a2d0515d 100644
 --- a/src/intel/vulkan/anv_device.c
 +++ b/src/intel/vulkan/anv_device.c
 @@ -1533,6 +1533,9 @@ VkResult anv_AllocateMemory(
@@ -23,3 +64,5 @@ index 1884932bbc7..cbc1b4aad87 100644
           /* Apply implicit sync to be compatible with clients relying on
            * implicit fencing. This matches the behavior in iris i915_batch
            * submit. An example client is VA-API (iHD), so only dedicated
+-- 
+2.48.1
