@@ -12,7 +12,7 @@
 
 pkgname=mesa-git
 pkgdesc="an open-source implementation of the OpenGL specification, git version"
-pkgver=25.1.0_devel.202282.13a3f9a9723.ae1e20f
+pkgver=25.1.0_devel.202818.87a90a3b387.869876d
 pkgrel=1
 arch=('x86_64')
 makedepends=(
@@ -94,12 +94,10 @@ source=(
     'mesa::git+https://gitlab.freedesktop.org/mesa/mesa.git#branch=main'
     'LICENSE'
     '0003-Xe2-gamescope.patch'
-    '0004-anv-align-UBO-descriptor-range-to-16B.patch'
-)
+    )
 sha256sums=('SKIP'
             '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2' # LICENSE
             '57d72262fcff8db835cd4a0bee36157097590403f9b4b50caf2d062dc79e7ec4' # 0003-Xe2-gamescope.patch
-            'd327465f1af6fb5340af08073f1e55a0c45cd7c1822cc04902dcb3ae229a1a22' # 0004-anv-align-UBO-descriptor-range-to-16B.patch
             '39278fbbf5fb4f646ce651690877f89d1c5811a3d4acb27700c1cb3cdb78fd3b' # proc-macro2
             '3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b' # quote
             '5267fca4496028628a95160fc423a33e8b2e6af8a5302579e322e4b520293cae' # syn
