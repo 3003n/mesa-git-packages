@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: ubuntu-latest
     outputs:
       mesa_hash: ${{ steps.mesa_hash.outputs.hash }}
       mesa_date: ${{ steps.mesa_hash.outputs.date }}
