@@ -12,8 +12,8 @@
 
 pkgname=mesa-git
 pkgdesc="an open-source implementation of the OpenGL specification, git version"
-pkgver=25.2.0_devel.205654.033ce1bae15.d41d8cd
-pkgrel=2
+pkgver=25.2.0_devel.206911.1c3f238ce99.d41d8cd
+pkgrel=1
 arch=('x86_64')
 makedepends=(
     'git'
@@ -93,11 +93,11 @@ license=('custom')
 source=(
     'mesa::git+https://gitlab.freedesktop.org/mesa/mesa.git#branch=main'
     'LICENSE'
-    '0003-Xe2-gamescope.patch'
+    # '0003-Xe2-gamescope.patch'
     )
 sha256sums=('SKIP'
             '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2' # LICENSE
-            '57d72262fcff8db835cd4a0bee36157097590403f9b4b50caf2d062dc79e7ec4' # 0003-Xe2-gamescope.patch
+            # '57d72262fcff8db835cd4a0bee36157097590403f9b4b50caf2d062dc79e7ec4' # 0003-Xe2-gamescope.patch
             '39278fbbf5fb4f646ce651690877f89d1c5811a3d4acb27700c1cb3cdb78fd3b' # proc-macro2
             '3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b' # quote
             '5267fca4496028628a95160fc423a33e8b2e6af8a5302579e322e4b520293cae' # syn
@@ -190,8 +190,8 @@ case $MESA_WHICH_LLVM in
     4)
         # extra/llvm
         makedepends+=(
-            'llvm=19.1.7'
-            'clang=19.1.7'
+            'llvm=20.1.6'
+            'clang=20.1.6'
             'libclc'
             'spirv-llvm-translator'
             'spirv-tools'
@@ -199,7 +199,7 @@ case $MESA_WHICH_LLVM in
             'rust-bindgen'
         )
         depends+=(
-            'llvm-libs=19.1.7'
+            'llvm-libs=20.1.6'
             'clang'
             'libclc'
             'spirv-llvm-translator'

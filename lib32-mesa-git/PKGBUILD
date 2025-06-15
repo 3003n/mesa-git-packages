@@ -32,13 +32,13 @@ license=('custom')
 source=('mesa::git+https://gitlab.freedesktop.org/mesa/mesa.git#branch=main'
         'LICENSE'
         'llvm32.native'
-        '0003-Xe2-gamescope.patch'
+        # '0003-Xe2-gamescope.patch'
 )
 
 sha256sums=('SKIP'
             '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2' # LICENSE
             '3ea259740141b862e152e07c58f05cad539680541dc181a7233be0c93414e6fb' # llvm32.native
-            '57d72262fcff8db835cd4a0bee36157097590403f9b4b50caf2d062dc79e7ec4' # 0003-Xe2-gamescope.patch
+            # '57d72262fcff8db835cd4a0bee36157097590403f9b4b50caf2d062dc79e7ec4' # 0003-Xe2-gamescope.patch
             )
 
 # NINJAFLAGS is an env var used to pass commandline options to ninja
@@ -81,12 +81,12 @@ case $MESA_WHICH_LLVM in
     4)
         # extra/llvm
         makedepends+=(
-            'lib32-llvm=1:19.1.7'
+            'lib32-llvm=1:20.1.6'
             'lib32-spirv-llvm-translator'
             'lib32-spirv-tools')
         depends+=(
             'lib32-clang'
-            'lib32-llvm-libs=1:19.1.7'
+            'lib32-llvm-libs=1:20.1.6'
             'lib32-spirv-llvm-translator'
             'lib32-spirv-tools')
         ;;
